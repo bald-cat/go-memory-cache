@@ -15,15 +15,29 @@ func NewCache() *Cache {
 }
 
 func (c *Cache) Set(key string, value interface{}, lifetime Second) {
+	c.CheckExpired()
 	c.values[key] = NewItem(key, value, lifetime)
 }
 
 func (c *Cache) Get(key string) interface{} {
+	c.CheckExpired()
 	return c.values[key].value
 }
 
 func (c *Cache) Delete(key string) {
 	delete(c.values, key)
+}
+
+func (c *Cache) CheckExpired() {
+	currentTime := time.Now()
+
+	for key, item := range c.values {
+		expirationTime := item.createdAt.Add(time.Duration(item.lifetime) * time.Second)
+
+		if currentTime.After(expirationTime) {
+			delete(c.values, key)
+		}
+	}
 }
 
 type Item struct {
