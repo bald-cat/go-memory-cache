@@ -28,6 +28,7 @@ func (c *Cache) Delete(key string) {
 	delete(c.values, key)
 }
 
+// CheckExpired Want to rewrite the method call to goroutines in the next version
 func (c *Cache) CheckExpired() {
 	currentTime := time.Now()
 
